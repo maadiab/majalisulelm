@@ -1,6 +1,6 @@
 package core
 
-type Lessons struct {
+type Lesson struct {
 	ID       int
 	Name     string
 	Type     string
