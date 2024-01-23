@@ -1,15 +1,11 @@
 package core
 
-import (
-	"github.com/google/uuid"
-)
-
 type User struct {
-	ID       uuid.UUID
-	Name     string
-	Mobile   int64
-	Email    string
-	Password string
+	ID       int    `db:"id"`
+	Name     string `db:"name"`
+	Mobile   int    `db:"mobile"`
+	Email    string `db:"email"`
+	Password string `db:"password"`
 }
 
 // type Users struct {
