@@ -6,8 +6,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/maadiab/majalisulelm/core"
-	"github.com/maadiab/majalisulelm/helper"
 )
 
 const (
@@ -16,6 +14,8 @@ const (
 	DbName   = "postgres"
 	Password = "passwd"
 )
+
+var DB *sqlx.DB
 
 // change it to init function later
 func ConnectDB() {
@@ -27,7 +27,6 @@ func ConnectDB() {
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
 	// test connection
 	err = db.Ping()
@@ -36,6 +35,7 @@ func ConnectDB() {
 	}
 	fmt.Println("connected sucsessfully to Database !!")
 
+	DB = db
 	// create table if not exist
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
@@ -49,39 +49,39 @@ func ConnectDB() {
 
 	if err != nil {
 		log.Fatal(err)
-	} else {
-
-		fmt.Println("users table created !!")
 	}
+
+	fmt.Println("users table created !!")
+
 	// test get user
 
-	userID := 1
+	// userID := 1
 
-	user, err := helper.GetUser(db, userID)
+	// user, err := helper.GetUser(db, userID)
 
-	if err != nil {
-		log.Fatal(err)
+	// if err != nil {
+	// 	log.Fatal(err)
 
-	}
+	// }
 
-	fmt.Println(user)
+	// fmt.Println(user)
 
 	// test add user
 
-	firstUser := core.User{
+	// firstUser := core.User{
 
-		Name:     "mohanad",
-		Mobile:   550795131,
-		Email:    "mohanad_diab@live.com",
-		Password: "Aa123",
-	}
+	// 	Name:     "mohanad",
+	// 	Mobile:   550795131,
+	// 	Email:    "mohanad_diab@live.com",
+	// 	Password: "Aa123",
+	// }
 
-	err = helper.CreateUser(db, firstUser)
-	if err != nil {
-		log.Fatal(err)
-	} else {
+	// err = helper.CreateUser(db, firstUser)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// } else {
 
-		fmt.Println("user added successfully !!")
-	}
+	// 	fmt.Println("user added successfully !!")
+	// }
 
 }
