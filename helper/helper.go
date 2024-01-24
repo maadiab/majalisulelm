@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jmoiron/sqlx"
@@ -17,15 +18,18 @@ func CreateUser(db *sqlx.DB, user core.User) error {
 	return err
 }
 
-// // get all users
-// func GetUsers(db *sqlx.DB) error {
-// 	// var user core.User
-// 	// // err := Database.dsn.get(&user, "SELECT id, name, mobile, email, password FROM users")
-// 	// _, err := db.Exec("SELECT id, name, mobile, email, password FROM users")
-// 	// if err != nil {
-// 	// 	log.Fatal(err)
-// 	// }
-// }
+// get all users
+func GetUsers(db *sqlx.DB) ([]core.User, error) {
+
+	var users []core.User
+	// shoud be a loop here
+	err := db.Select(&users, "SELECT name, mobile, email FROM users")
+	if err != nil {
+		fmt.Println("Error in function GetUsers !")
+
+	}
+	return users, err
+}
 
 // get user by id
 func GetUser(db *sqlx.DB, userID int) (core.User, error) {
@@ -34,7 +38,6 @@ func GetUser(db *sqlx.DB, userID int) (core.User, error) {
 	err := db.Get(&user, "SELECT id, name, mobile, email, password FROM users where id= $1", userID)
 	if err != nil {
 		log.Fatal(err)
-
 	}
 	return user, nil
 }

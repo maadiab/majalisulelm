@@ -38,21 +38,6 @@ func ConnectDB() {
 	DB = db
 	// create table if not exist
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
-		name VARCHAR (255),
-		mobile INT,
-		email VARCHAR (255),
-		password VARCHAR (255)
-		)
-		`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("users table created !!")
-
 	// test get user
 
 	// userID := 1
@@ -84,4 +69,22 @@ func ConnectDB() {
 	// 	fmt.Println("user added successfully !!")
 	// }
 
+}
+
+func CreateUsersTable() {
+	_, err := DB.Exec(`CREATE TABLE IF NOT EXISTS users (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR (255),
+		mobile INT,
+		email VARCHAR (255),
+		password VARCHAR (255)
+		)
+		`)
+
+	if err != nil {
+
+		log.Println("Error Creating User Table In Database!!!")
+	}
+
+	fmt.Println("Creating Table If Not Exists ...")
 }
