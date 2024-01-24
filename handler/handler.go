@@ -84,7 +84,7 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetById(w http.ResponseWriter, r *http.Request) {
+func Get(w http.ResponseWriter, r *http.Request) {
 
 }
 
@@ -92,6 +92,6 @@ func DeleteAll(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func DeleteById(w http.ResponseWriter, r *http.Request) {
+func Delete(w http.ResponseWriter, r *http.Request) {
 
 }
