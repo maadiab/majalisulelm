@@ -93,6 +93,16 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "application/json")
+
+	lessons := helper.GetAllLessons(Database.DB)
+	data, err := json.Marshal(lessons)
+	if err != nil {
+		log.Println("Error Marshalling lessons json!!!")
+	}
+
+	w.Write(data)
+
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {

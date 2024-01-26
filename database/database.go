@@ -33,7 +33,7 @@ func ConnectDB() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("connected sucsessfully to Database ...")
+	log.Println("connected sucsessfully to Database ...")
 
 	DB = db
 	// create table if not exist
@@ -86,7 +86,7 @@ func CreateUsersTable() {
 		log.Println("Error Creating User Table In Database!!!")
 	} else {
 
-		fmt.Println("Creating Users Table If Not Exists ...")
+		log.Println("Creating Users Table If Not Exists ...")
 	}
 }
 

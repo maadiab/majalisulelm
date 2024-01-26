@@ -13,6 +13,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/getallusers", handler.GetSystemUsers).Methods("GET")
 	router.HandleFunc("/addlesson", handler.Create).Methods("POST")
 	router.HandleFunc("/getlesson/{id}", handler.Get).Methods("GET")
+	router.HandleFunc("/getlessons", handler.GetAll).Methods("GET")
 
 	return router
 }

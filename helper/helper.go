@@ -55,7 +55,15 @@ func DeleteUser(userId int) {
 
 // get all lessons
 
-func GetAllLessons() {
+func GetAllLessons(db *sqlx.DB) []core.Lesson {
+	var lessons []core.Lesson
+
+	err := db.Select(&lessons, "SELECT * FROM lessons")
+	if err != nil {
+		log.Println("Error Getting Lessons From Database!!!")
+	}
+
+	return lessons
 
 }
 
