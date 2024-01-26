@@ -11,7 +11,8 @@ import (
 // create user record
 
 func CreateUser(db *sqlx.DB, user core.User) error {
-	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)", user.Name, user.Mobile, user.Mobile, user.Password)
+	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
+		user.Name, user.Mobile, user.Mobile, user.Password)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,8 +65,17 @@ func DeleteAllLessons(lessonId int) {
 }
 
 // get lesson by id
-func GetLessonById(lessonId int) {
+func GetLessonById(db *sqlx.DB, lessonID int) (core.Lesson, error) {
+	var lesson core.Lesson
 
+	err := db.Get(&lesson, "SELECT id,name,type,author,duration,time,link,location FROM lessons where id=$1", lessonID)
+
+	if err != nil {
+
+		log.Println("Error getting lesson from db!!!")
+	}
+
+	return lesson, err
 }
 
 // delete lesson
@@ -74,6 +84,11 @@ func DeleteLessonById(lessonId int) {
 }
 
 // create lesson
-func CreateLesson(lesson core.Lesson) {
+func CreateLesson(db *sqlx.DB, lesson core.Lesson) error {
+	_, err := db.Exec("INSERT INTO lessons (name, type, duration, author, link, time, location) VALUES ($1,$2,$3,$4,$5,$6,$7)", lesson.Name, lesson.Type, lesson.Duration, lesson.Author, lesson.Link, lesson.Time, lesson.Location)
+	if err != nil {
+		log.Println("Error Adding Lesson To Database !")
+	}
 
+	return err
 }

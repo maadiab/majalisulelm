@@ -33,7 +33,7 @@ func ConnectDB() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("connected sucsessfully to Database !!")
+	fmt.Println("connected sucsessfully to Database ...")
 
 	DB = db
 	// create table if not exist
@@ -84,7 +84,29 @@ func CreateUsersTable() {
 	if err != nil {
 
 		log.Println("Error Creating User Table In Database!!!")
-	}
+	} else {
 
-	fmt.Println("Creating Table If Not Exists ...")
+		fmt.Println("Creating Users Table If Not Exists ...")
+	}
+}
+
+func CreateLessonsTable() {
+	_, err := DB.Exec(`CREATE TABLE IF NOT EXISTS lessons (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR (255),
+		type VARCHAR (255),
+		duration VARCHAR (255),
+		author VARCHAR (255),
+		link VARCHAR (255),
+		time VARCHAR (255),
+		location VARCHAR (255)
+	)`)
+
+	if err != nil {
+
+		log.Println("Error Creating Lessons Table In Database!!!")
+	} else {
+
+		log.Println("Creating Lessons Table If Not Exists ...")
+	}
 }

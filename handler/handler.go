@@ -78,6 +78,17 @@ func DeleteSystemUser(w http.ResponseWriter, r *http.Request) {
 
 func Create(w http.ResponseWriter, r *http.Request) {
 
+	var lesson core.Lesson
+	err := json.NewDecoder(r.Body).Decode(&lesson)
+	if err != nil {
+		log.Fatal(err)
+		fmt.Println("error here from decoding lesson json !!")
+	}
+	err = helper.CreateLesson(Database.DB, lesson)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +97,26 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 
 func Get(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "application/json")
+	var lesson core.Lesson
+	params := mux.Vars(r)
+
+	lessonID, err := strconv.ParseUint(params["id"], 32, 32)
+	if err != nil {
+		log.Fatal(err)
+	}
+	lesson, nil := helper.GetLessonById(Database.DB, int(lessonID))
+	if err != nil {
+		log.Println(err)
+	}
+
+	data, err := json.Marshal(lesson)
+	if err != nil {
+
+		log.Println("Error Parsing Lesson")
+	}
+
+	w.Write(data)
 }
 
 func DeleteAll(w http.ResponseWriter, r *http.Request) {
