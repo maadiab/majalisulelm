@@ -15,7 +15,7 @@ import (
 )
 
 func ServeHome(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("<h1>This is the home page</h1>"))
+	helper.ServeTemplates(w, "home.page.html")
 }
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +100,6 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error Marshalling lessons json!!!")
 	}
-
 	w.Write(data)
 
 }
@@ -119,13 +118,11 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
 	data, err := json.Marshal(lesson)
 	if err != nil {
 
 		log.Println("Error Parsing Lesson")
 	}
-
 	w.Write(data)
 }
 

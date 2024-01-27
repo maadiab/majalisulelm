@@ -7,6 +7,7 @@ import (
 
 func Router() *mux.Router {
 	router := mux.NewRouter()
+
 	router.HandleFunc("/", handler.ServeHome).Methods("GET")
 	router.HandleFunc("/createuser", handler.CreateSystemUser).Methods("POST")
 	router.HandleFunc("/getuser/{id}", handler.GetSystemUser).Methods("GET")

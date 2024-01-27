@@ -2,11 +2,24 @@ package helper
 
 import (
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/maadiab/majalisulelm/core"
 )
+
+// serve html templates
+func ServeTemplates(w http.ResponseWriter, tmpl string) {
+
+	parsedTemplates, _ := template.ParseFiles("./templates/" + tmpl)
+	err := parsedTemplates.Execute(w, nil)
+	if err != nil {
+		log.Println("Error Parsing template", err)
+	}
+
+}
 
 // create user record
 
