@@ -131,5 +131,16 @@ func DeleteAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	lessonID, err := strconv.ParseUint(params["id"], 32, 32)
+	if err != nil {
+		log.Fatal(err)
+	}
+	helper.DeleteLessonById(Database.DB, int(lessonID))
+
+	if err != nil {
+		log.Println("Error Deleting Lesson!!!")
+	}
 
 }

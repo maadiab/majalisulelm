@@ -81,8 +81,15 @@ func GetAllLessons(db *sqlx.DB) []core.Lesson {
 }
 
 // delete all lessons
-func DeleteAllLessons(lessonId int) {
+func DeleteAllLessons(db *sqlx.DB) error {
 
+	_, err := db.Exec("DELETE * FROM lessons")
+	if err != nil {
+
+		log.Println("Error Deleting All Lessons!!!")
+	}
+
+	return err
 }
 
 // get lesson by id
@@ -100,8 +107,12 @@ func GetLessonById(db *sqlx.DB, lessonID int) (core.Lesson, error) {
 }
 
 // delete lesson
-func DeleteLessonById(lessonId int) {
-
+func DeleteLessonById(db *sqlx.DB, lessonId int) error {
+	_, err := db.Exec("DELETE FROM lessons where id=$1", lessonId)
+	if err != nil {
+		log.Println("Error Deleting From Lessons!!!")
+	}
+	return err
 }
 
 // create lesson
