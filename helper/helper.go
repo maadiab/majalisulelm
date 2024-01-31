@@ -24,6 +24,12 @@ func ServeTemplates(w http.ResponseWriter, tmpl string) {
 // create user record
 
 func CreateUser(db *sqlx.DB, user core.User) error {
+
+	// if user send an empty json
+
+	// if user send incorrect json
+
+	// if it good
 	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
 		user.Name, user.Mobile, user.Mobile, user.Password)
 	if err != nil {
@@ -40,7 +46,6 @@ func GetUsers(db *sqlx.DB) ([]core.User, error) {
 	err := db.Select(&users, "SELECT name, mobile, email FROM users")
 	if err != nil {
 		fmt.Println("Error in function GetUsers !")
-
 	}
 	return users, err
 }
@@ -62,8 +67,14 @@ func UpdateUser(userId int) {
 }
 
 // delete user
-func DeleteUser(userId int) {
+func DeleteUser(db *sqlx.DB, userId int) error {
+	_, err := db.Exec("DELETE FROM users where id=$1", userId)
+	if err != nil {
 
+		log.Println("Error Deleting user !!!")
+	}
+
+	return err
 }
 
 // get all lessons
@@ -75,7 +86,6 @@ func GetAllLessons(db *sqlx.DB) []core.Lesson {
 	if err != nil {
 		log.Println("Error Getting Lessons From Database!!!")
 	}
-
 	return lessons
 
 }
@@ -88,7 +98,6 @@ func DeleteAllLessons(db *sqlx.DB) error {
 
 		log.Println("Error Deleting All Lessons!!!")
 	}
-
 	return err
 }
 
