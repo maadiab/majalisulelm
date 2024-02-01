@@ -16,6 +16,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/getlesson/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/getlessons", handler.GetAll).Methods("GET")
 	router.HandleFunc("/deletelesson/{id}", handler.Delete).Methods("DELETE")
+	router.HandleFunc("/login", handler.Login).Methods("POST")
 
 	return router
 }

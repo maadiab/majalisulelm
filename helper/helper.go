@@ -8,6 +8,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/maadiab/majalisulelm/core"
+	"github.com/maadiab/majalisulelm/middleware"
 )
 
 // serve html templates
@@ -23,19 +24,24 @@ func ServeTemplates(w http.ResponseWriter, tmpl string) {
 
 // create user record
 
-func CreateUser(db *sqlx.DB, user core.User) error {
+func CreateUser(db *sqlx.DB, user core.User) {
 
-	// if user send an empty json
+	if middleware.Authorized {
+		// if user send an empty json
 
-	// if user send incorrect json
+		// if user send incorrect json
 
-	// if it good
-	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
-		user.Name, user.Mobile, user.Mobile, user.Password)
-	if err != nil {
-		log.Fatal(err)
+		// if it good
+		_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
+			user.Name, user.Mobile, user.Mobile, user.Password)
+		if err != nil {
+			log.Println("Error Creating user !!!")
+		}
+
+	} else {
+		log.Println("You Are Not Authenticated, Please Sign In !!!")
 	}
-	return err
+
 }
 
 // get all users
@@ -62,8 +68,19 @@ func GetUser(db *sqlx.DB, userID int) (core.User, error) {
 }
 
 // update user
-func UpdateUser(userId int) {
+func UpdateUser(db *sqlx.DB, userId int, userData core.User) error {
 
+	_, err := db.Exec(`"UPDATE users
+	SET name = $1, mobile =$2, email = $3, password= $4
+	where id =$5
+	"`, userId, userData.Name, userData.Mobile, userData.Email, userData.Password)
+
+	if err != nil {
+
+		log.Println("Error Updating User !!!")
+	}
+
+	return err
 }
 
 // delete user

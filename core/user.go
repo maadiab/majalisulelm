@@ -8,6 +8,7 @@ type User struct {
 	Password string `db:"password"`
 }
 
+// type UserLogin struct
 // type Users struct {
 // 	Users []User `json:"users"`
 // }

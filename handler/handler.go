@@ -12,10 +12,25 @@ import (
 	"github.com/maadiab/majalisulelm/core"
 	Database "github.com/maadiab/majalisulelm/database"
 	"github.com/maadiab/majalisulelm/helper"
+	"github.com/maadiab/majalisulelm/middleware"
 )
 
 func ServeHome(w http.ResponseWriter, r *http.Request) {
 	helper.ServeTemplates(w, "home.page.html")
+}
+
+// login
+
+func Login(w http.ResponseWriter, r *http.Request) {
+
+	var user core.User
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		log.Println("Error Decoding user Data for login")
+	}
+
+	middleware.CheckUser(Database.DB, user.Name, user.Email)
 }
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
@@ -25,10 +40,8 @@ func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 		fmt.Println("error here from decoding json !!")
 	}
-	err = helper.CreateUser(Database.DB, user)
-	if err != nil {
-		log.Fatal(err)
-	}
+	helper.CreateUser(Database.DB, user)
+
 }
 
 func GetSystemUser(w http.ResponseWriter, r *http.Request) {
