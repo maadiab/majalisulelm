@@ -8,7 +8,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/maadiab/majalisulelm/core"
-	"github.com/maadiab/majalisulelm/middleware"
 )
 
 // serve html templates
@@ -26,21 +25,18 @@ func ServeTemplates(w http.ResponseWriter, tmpl string) {
 
 func CreateUser(db *sqlx.DB, user core.User) {
 
-	if middleware.Authorized {
-		// if user send an empty json
+	// if user send an empty json
 
-		// if user send incorrect json
+	// if user send incorrect json
 
-		// if it good
-		_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
-			user.Name, user.Mobile, user.Mobile, user.Password)
-		if err != nil {
-			log.Println("Error Creating user !!!")
-		}
-
-	} else {
-		log.Println("You Are Not Authenticated, Please Sign In !!!")
+	// if it good
+	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
+		user.Name, user.Mobile, user.Mobile, user.Password)
+	if err != nil {
+		log.Println("Error Creating user !!!")
 	}
+
+	log.Println("You Are Not Authenticated, Please Sign In !!!")
 
 }
 

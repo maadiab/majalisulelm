@@ -23,14 +23,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 
-	var user core.User
+	var user middleware.Credentials
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		log.Println("Error Decoding user Data for login")
 	}
 
-	middleware.CheckUser(Database.DB, user.Name, user.Email)
+	middleware.CheckUser(Database.DB, user)
 }
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
