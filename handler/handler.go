@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 
 	"github.com/maadiab/majalisulelm/core"
@@ -19,19 +20,19 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 	helper.ServeTemplates(w, "home.page.html")
 }
 
-// login
+// // login
 
-func Login(w http.ResponseWriter, r *http.Request) {
+// func Login(w http.ResponseWriter, r *http.Request) {
 
-	var user middleware.Credentials
+// 	var user middleware.Credentials
 
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil {
-		log.Println("Error Decoding user Data for login")
-	}
+// 	err := json.NewDecoder(r.Body).Decode(&user)
+// 	if err != nil {
+// 		log.Println("Error Decoding user Data for login")
+// 	}
 
-	middleware.CheckUser(Database.DB, user)
-}
+// 	middleware.CheckUser(Database.DB, user)
+// }
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
 	var user core.User
@@ -106,7 +107,45 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Content-Type", "application/json")
+	cookie, err := r.Cookie("token")
+
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tokenStr := cookie.Value
+
+	claims := &middleware.Claims{}
+
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
+		return middleware.JwtKey, nil
+
+	})
+
+	if err != nil {
+
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+	}
+
+	if !tkn.Valid {
+
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+
+	w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
+	// w.Header().Set("Content-Type", "application/json")
 
 	lessons := helper.GetAllLessons(Database.DB)
 	data, err := json.Marshal(lessons)
@@ -114,6 +153,7 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error Marshalling lessons json!!!")
 	}
 	w.Write(data)
+	log.Println(cookie)
 
 }
 
@@ -137,6 +177,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error Parsing Lesson")
 	}
 	w.Write(data)
+
 }
 
 func DeleteAll(w http.ResponseWriter, r *http.Request) {

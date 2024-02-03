@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gorilla/mux"
 	"github.com/maadiab/majalisulelm/handler"
+	"github.com/maadiab/majalisulelm/middleware"
 )
 
 func Router() *mux.Router {
@@ -16,7 +17,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/getlesson/{id}", handler.Get).Methods("GET")
 	router.HandleFunc("/getlessons", handler.GetAll).Methods("GET")
 	router.HandleFunc("/deletelesson/{id}", handler.Delete).Methods("DELETE")
-	router.HandleFunc("/login", handler.Login).Methods("POST")
+	router.HandleFunc("/login", middleware.Login).Methods("POST")
 
 	return router
 }
