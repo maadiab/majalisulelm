@@ -12,9 +12,7 @@ import (
 	Database "github.com/maadiab/majalisulelm/database"
 )
 
-var Authorized bool
-
-var UserVerified string
+// var Authorized bool
 
 func CheckUser(db *sqlx.DB, user Credentials) {
 
@@ -23,27 +21,16 @@ func CheckUser(db *sqlx.DB, user Credentials) {
 
 	err := db.Get(&userCred, query, user.Username, user.Password)
 
-	// user.Username, user.Password
-
-	// log.Println("checking db")
-	// log.Printf("%T", user.Username)
-
-	// log.Println(user.Password)
-	// fmt.Println(user.Username, user.Password)
-
 	if err != nil {
 		log.Println("Please Check Username and Password !!!", err)
 		return
 	}
 
 	log.Println("User Verified Successfully ...")
-	// Authorized = true
 
-	// Login()
-	// return Credentials.Username
 }
 
-var JwtKey = []byte("sectret_key")
+var JwtKey = []byte("secret_key")
 
 type Credentials struct {
 	Username string `json:"username"`
@@ -60,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&cred)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		log.Println("Error Decoding user Data for login")
+		log.Println("Error Decoding user Data for login !!!")
 		return
 	}
 
@@ -68,7 +55,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	expirationTime := time.Now().Add(time.Minute * 5)
 	claims := &Claims{
-		Username: UserVerified,
+		Username: cred.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
