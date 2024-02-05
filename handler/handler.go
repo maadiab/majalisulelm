@@ -16,7 +16,49 @@ import (
 	"github.com/maadiab/majalisulelm/middleware"
 )
 
+func Authentication(w http.ResponseWriter, r *http.Request) error {
+
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return err
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return err
+	}
+
+	tokenStr := cookie.Value
+	claims := &middleware.Claims{}
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
+		return middleware.JwtKey, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return err
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return err
+	}
+
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+
+	// w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
+
+	log.Println("Hello, ", claims.Username)
+	return err
+}
+
 func ServeHome(w http.ResponseWriter, r *http.Request) {
+
+	// ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	// fmt.Println(ctx)
+	// defer cancel()
+
 	helper.ServeTemplates(w, "home.page.html")
 }
 
@@ -35,8 +77,14 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 // }
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
+
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
+
 	var user core.User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		log.Fatal(err)
 		fmt.Println("error here from decoding json !!")
@@ -47,6 +95,11 @@ func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
 
 func GetSystemUser(w http.ResponseWriter, r *http.Request) {
 
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
+
 	// set the Content-Type header to application/json
 	w.Header().Set("Content-Type", "application/json")
 
@@ -55,7 +108,8 @@ func GetSystemUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userID, err := strconv.ParseUint(params["id"], 32, 32)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("No user found !!!")
+		return
 	}
 
 	user, nil := helper.GetUser(Database.DB, int(userID))
@@ -63,7 +117,7 @@ func GetSystemUser(w http.ResponseWriter, r *http.Request) {
 	// convert the user struct to json
 	jsonData, err := json.Marshal(user)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error no user found !!!")
 	}
 
 	// write the json data to response writer
@@ -71,6 +125,13 @@ func GetSystemUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSystemUsers(w http.ResponseWriter, r *http.Request) {
+
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
+	// w.Header().Set("Content-Type", "application/json")
+
 	w.Header().Set("Content-Type", "application/json")
 
 	data, err := helper.GetUsers(Database.DB)
@@ -82,18 +143,24 @@ func GetSystemUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("error marshalling data")
 	}
-
 	w.Write(jsonData)
 }
 
 func DeleteSystemUser(w http.ResponseWriter, r *http.Request) {
-
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
 
 	var lesson core.Lesson
-	err := json.NewDecoder(r.Body).Decode(&lesson)
+	err = json.NewDecoder(r.Body).Decode(&lesson)
 	if err != nil {
 		log.Fatal(err)
 		fmt.Println("error here from decoding lesson json !!")
@@ -106,63 +173,33 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
-
-	cookie, err := r.Cookie("token")
-
+	err := Authentication(w, r)
 	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		log.Println("Not Authorized !!!")
 	}
 
-	tokenStr := cookie.Value
-
-	claims := &middleware.Claims{}
-
-	tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-		return middleware.JwtKey, nil
-
-	})
-
-	if err != nil {
-
-		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		w.WriteHeader(http.StatusBadRequest)
-		return
-
-	}
-
-	if !tkn.Valid {
-
-		w.WriteHeader(http.StatusUnauthorized)
-	}
-
-	w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
-	// w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	lessons := helper.GetAllLessons(Database.DB)
 	data, err := json.Marshal(lessons)
 	if err != nil {
 		log.Println("Error Marshalling lessons json!!!")
 	}
+
 	w.Write(data)
-	log.Println(cookie)
 
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {
 
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	var lesson core.Lesson
 	params := mux.Vars(r)
-
 	lessonID, err := strconv.ParseUint(params["id"], 32, 32)
 	if err != nil {
 		log.Fatal(err)
@@ -181,12 +218,19 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAll(w http.ResponseWriter, r *http.Request) {
-
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
 
+	err := Authentication(w, r)
+	if err != nil {
+		log.Println("Not Authorized !!!")
+	}
+	params := mux.Vars(r)
 	lessonID, err := strconv.ParseUint(params["id"], 32, 32)
 	if err != nil {
 		log.Fatal(err)

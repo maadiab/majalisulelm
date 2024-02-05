@@ -58,7 +58,7 @@ func GetUser(db *sqlx.DB, userID int) (core.User, error) {
 	var user core.User
 	err := db.Get(&user, "SELECT id, name, mobile, email, password FROM users where id= $1", userID)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("NO user found !!!")
 	}
 	return user, nil
 }

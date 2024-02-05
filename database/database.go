@@ -1,6 +1,7 @@
 package Database
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -18,10 +19,12 @@ const (
 var DB *sqlx.DB
 
 // change it to init function later
-func ConnectDB() {
+func ConnectDB(ctx context.Context) (*sqlx.DB, error) {
 	var connStr = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", Host, User, Password, DbName)
 
-	db, err := sqlx.Open("postgres", connStr)
+	// sqlx.Open("postgres", connStr)
+
+	db, err := sqlx.ConnectContext(ctx, "postgres", connStr)
 
 	// open connection
 	if err != nil {
@@ -33,9 +36,12 @@ func ConnectDB() {
 	if err != nil {
 		panic(err)
 	}
+
 	log.Println("connected sucsessfully to Database ...")
 
 	DB = db
+
+	return db, err
 	// create table if not exist
 
 	// test get user
