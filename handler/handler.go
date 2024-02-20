@@ -1,4 +1,4 @@
-package handler
+package Handler
 
 import (
 	"encoding/json"
@@ -7,50 +7,28 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 
 	"github.com/maadiab/majalisulelm/core"
 	Database "github.com/maadiab/majalisulelm/database"
 	"github.com/maadiab/majalisulelm/helper"
-	"github.com/maadiab/majalisulelm/middleware"
+	Middleware "github.com/maadiab/majalisulelm/middleware"
 )
 
-func Authentication(w http.ResponseWriter, r *http.Request) error {
-
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
-			return err
+func hasPermissions(userPermissions []string, requiredPermissions []string) bool {
+	for _, perm := range requiredPermissions {
+		found := false
+		for _, userPerm := range userPermissions {
+			if perm == userPerm {
+				found = true
+				break
+			}
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		return err
-	}
-
-	tokenStr := cookie.Value
-	claims := &middleware.Claims{}
-	tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-		return middleware.JwtKey, nil
-	})
-
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
-			return err
+		if !found {
+			return false
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		return err
 	}
-
-	if !tkn.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
-	}
-
-	// w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
-
-	log.Println("Hello, ", claims.Username)
-	return err
+	return true
 }
 
 func ServeHome(w http.ResponseWriter, r *http.Request) {
@@ -78,13 +56,21 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 
 func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
 
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
+	requiredPermissons := []string{"read", "write"}
+	claims, ok := r.Context().Value("claims").(*Middleware.Claims)
+	if !ok {
+		log.Println("no permissions found", ok)
+		http.Error(w, "permissons not found !!! ", http.StatusInternalServerError)
+		return
+	}
+
+	if !hasPermissions(claims.Permissions, requiredPermissons) {
+		http.Error(w, "insufficient permissions !!!", http.StatusForbidden)
+		return
 	}
 
 	var user core.User
-	err = json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		log.Fatal(err)
 		fmt.Println("error here from decoding json !!")
@@ -94,11 +80,6 @@ func CreateSystemUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSystemUser(w http.ResponseWriter, r *http.Request) {
-
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
 
 	// set the Content-Type header to application/json
 	w.Header().Set("Content-Type", "application/json")
@@ -126,10 +107,6 @@ func GetSystemUser(w http.ResponseWriter, r *http.Request) {
 
 func GetSystemUsers(w http.ResponseWriter, r *http.Request) {
 
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
 	// w.Header().Set("Content-Type", "application/json")
 
 	w.Header().Set("Content-Type", "application/json")
@@ -147,20 +124,13 @@ func GetSystemUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteSystemUser(w http.ResponseWriter, r *http.Request) {
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
+
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
 
 	var lesson core.Lesson
-	err = json.NewDecoder(r.Body).Decode(&lesson)
+	err := json.NewDecoder(r.Body).Decode(&lesson)
 	if err != nil {
 		log.Fatal(err)
 		fmt.Println("error here from decoding lesson json !!")
@@ -173,10 +143,6 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -191,11 +157,6 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {
-
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
 
 	w.Header().Set("Content-Type", "application/json")
 	var lesson core.Lesson
@@ -218,18 +179,12 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAll(w http.ResponseWriter, r *http.Request) {
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
+
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 
-	err := Authentication(w, r)
-	if err != nil {
-		log.Println("Not Authorized !!!")
-	}
+	// requiredPermissions := []string{"admin"}
 	params := mux.Vars(r)
 	lessonID, err := strconv.ParseUint(params["id"], 32, 32)
 	if err != nil {

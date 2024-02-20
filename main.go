@@ -37,6 +37,7 @@ func main() {
 	Database.CreateLessonsTable()
 	r := router.Router()
 	fmt.Println("server is running at port: 8080 ...")
+
 	http.ListenAndServe(":8080", r)
 
 	defer Database.DB.Close()

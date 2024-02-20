@@ -6,6 +6,8 @@ type User struct {
 	Mobile   int    `db:"mobile"`
 	Email    string `db:"email"`
 	Password string `db:"password"`
+	// Permissions []pq.StringArray `db:"permissions"`
+	Permissions string `db:"permissions"`
 }
 
 // type UserLogin struct

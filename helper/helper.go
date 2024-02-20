@@ -30,13 +30,13 @@ func CreateUser(db *sqlx.DB, user core.User) {
 	// if user send incorrect json
 
 	// if it good
-	_, err := db.Exec("INSERT INTO users (name, mobile, email, password) VALUES ($1,$2,$3,$4)",
-		user.Name, user.Mobile, user.Mobile, user.Password)
+	_, err := db.Exec("INSERT INTO users (name, mobile, email, password, permissions) VALUES ($1,$2,$3,$4,$5)",
+		user.Name, user.Mobile, user.Email, user.Password, user.Permissions)
 	if err != nil {
-		log.Println("Error Creating user !!!")
+		log.Println("Error Creating user !!!", err)
 	}
 
-	log.Println("You Are Not Authenticated, Please Sign In !!!")
+	// log.Println("You Are Not Authenticated, Please Sign In !!!")
 
 }
 

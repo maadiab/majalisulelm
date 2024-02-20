@@ -1,4 +1,4 @@
-package middleware
+package Middleware
 
 import (
 	"context"
@@ -15,10 +15,12 @@ import (
 
 // var Authorized bool
 
+var UserPerms []string
+
 func CheckUser(ctx context.Context, db *sqlx.DB, user Credentials) {
 
 	var userCred core.User
-	query := "SELECT name, password FROM users where name =$1 and password =$2"
+	query := "SELECT * FROM users where name =$1 and password =$2"
 
 	err := db.Get(&userCred, query, user.Username, user.Password)
 
@@ -27,11 +29,27 @@ func CheckUser(ctx context.Context, db *sqlx.DB, user Credentials) {
 		return
 	}
 
+	var userPermissions []string
+	err = db.Select(&userPermissions, "SELECT permission_value FROM permissions WHERE permission_name = $1", userCred.Permissions)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	log.Println("User Verified Successfully ...")
+
+	// UserPerms = userPermissions
+	log.Println(userPermissions)
+	UserPerms = userPermissions
 
 }
 
 var JwtKey = []byte("secret_key")
+
+// type Permissions struct {
+// 	UserType  string `json:"permission_name"`
+// 	Userperms string `json:"permission_value"`
+// }
 
 type Credentials struct {
 	Username string `json:"username"`
@@ -39,7 +57,8 @@ type Credentials struct {
 }
 
 type Claims struct {
-	Username string `json:"username"`
+	Username    string   `json:"username"`
+	Permissions []string `json:"permissions"`
 	jwt.StandardClaims
 }
 
@@ -56,7 +75,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	expirationTime := time.Now().Add(time.Minute * 5)
 	claims := &Claims{
-		Username: cred.Username,
+		Username:    cred.Username,
+		Permissions: UserPerms,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -66,7 +86,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := token.SignedString(JwtKey)
 
 	if err != nil {
-
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -132,5 +151,57 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 		Value:   tokenString,
 		Expires: expirationTime,
 	})
+
+}
+
+func Authenticate(next http.HandlerFunc) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		tokenStr := cookie.Value
+		claims := &Claims{}
+
+		tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
+			return JwtKey, nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if !tkn.Valid {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+
+		// w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
+
+		// claims, ok := tkn.Claims.(*Claims)
+		// if !ok {
+		// 	log.Println(ok)
+		// }
+
+		log.Println("Hello, ", claims.Username)
+
+		ctx := context.WithValue(r.Context(), "claims", claims)
+		next.ServeHTTP(w, r.WithContext(ctx))
+
+		// next.RequiredPermissions
+		// log.Println(next.RequiredPermissions)
+
+	}
 
 }
