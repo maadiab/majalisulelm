@@ -8,6 +8,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/maadiab/majalisulelm/core"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // serve html templates
@@ -21,6 +22,11 @@ func ServeTemplates(w http.ResponseWriter, tmpl string) {
 
 }
 
+func HashPassword(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+}
+
 // create user record
 
 func CreateUser(db *sqlx.DB, user core.User) {
@@ -30,8 +36,17 @@ func CreateUser(db *sqlx.DB, user core.User) {
 	// if user send incorrect json
 
 	// if it good
-	_, err := db.Exec("INSERT INTO users (name, mobile, email, password, permissions) VALUES ($1,$2,$3,$4,$5)",
-		user.Name, user.Mobile, user.Email, user.Password, user.Permissions)
+
+	inputPassword := user.Password
+
+	hashedPassword, err := HashPassword(inputPassword)
+	if err != nil {
+		log.Println("Error Hashing password !!!", err)
+	}
+
+	_, err = db.Exec("INSERT INTO users (name, mobile, email, password, permissions) VALUES ($1,$2,$3,$4,$5)",
+		user.Name, user.Mobile, user.Email, hashedPassword, user.Permissions)
+
 	if err != nil {
 		log.Println("Error Creating user !!!", err)
 	}

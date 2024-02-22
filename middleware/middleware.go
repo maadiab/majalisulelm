@@ -11,21 +11,57 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/maadiab/majalisulelm/core"
 	Database "github.com/maadiab/majalisulelm/database"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // var Authorized bool
 
 var UserPerms []string
 
+func ComparePassword(hashedPassword []byte, inputPassword string) error {
+	return bcrypt.CompareHashAndPassword(hashedPassword, []byte(inputPassword))
+
+}
+
 func CheckUser(ctx context.Context, db *sqlx.DB, user Credentials) {
 
 	var userCred core.User
-	query := "SELECT * FROM users where name =$1 and password =$2"
 
-	err := db.Get(&userCred, query, user.Username, user.Password)
+	var inputPassword = user.Password
+
+	// hashedPassword, err := helper.HashPassword(inputPassword)
+
+	log.Println(user.Username)
+	log.Println(inputPassword)
+	// log.Println(string(hashedPassword))
+
+	var hashedPassword string
+	query0 := "SELECT password FROM users where name =$1"
+
+	err := db.Get(&hashedPassword, query0, user.Username)
 
 	if err != nil {
 		log.Println("Please Check Username and Password !!!", err)
+		log.Println(hashedPassword)
+		return
+	}
+
+	err = ComparePassword([]byte(hashedPassword), user.Password)
+	if err != nil {
+		log.Println("Error Hashing password !!!", err)
+	}
+
+	// err = ComparePassword(hashedPassword, string(inputPassword))
+	// if err != nil {
+	// 	log.Println("Password not same !!!", err)
+	// }
+	query := "SELECT * FROM users where name =$1 and password =$2"
+
+	err = db.Get(&userCred, query, user.Username, string(hashedPassword))
+
+	if err != nil {
+		log.Println("Please Check Username and Password !!!", err)
+		log.Println(userCred)
 		return
 	}
 
