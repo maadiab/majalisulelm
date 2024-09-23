@@ -28,7 +28,7 @@ func ConnectDB(ctx context.Context) (*sqlx.DB, error) {
 
 	// open connection
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Error Openning connection %w", err)
 	}
 
 	// test connection
