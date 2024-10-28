@@ -16,8 +16,8 @@ func Router() *mux.Router {
 	router.HandleFunc("/getuser/{id}", Middleware.Authenticate(Handler.GetSystemUser)).Methods("GET")
 	router.HandleFunc("/getallusers", Middleware.Authenticate(Handler.GetSystemUsers)).Methods("GET")
 	router.HandleFunc("/addlesson", Middleware.Authenticate(Handler.Create)).Methods("POST")
-	router.HandleFunc("/getlesson/{id}", Middleware.Authenticate(Handler.Get)).Methods("GET")
-	router.HandleFunc("/getlessons", Middleware.Authenticate(Handler.GetAll)).Methods("GET")
+	router.HandleFunc("/lesson/{id}", Middleware.Authenticate(Handler.Get)).Methods("GET")
+	router.HandleFunc("/lessons", Middleware.Authenticate(Handler.GetAll)).Methods("GET")
 	router.HandleFunc("/deletelesson/{id}", Middleware.Authenticate(Handler.Delete)).Methods("DELETE")
 	router.HandleFunc("/login", Middleware.Login).Methods("POST")
 

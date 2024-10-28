@@ -28,7 +28,7 @@ func main() {
 			log.Println("Connection Cancelled !!!")
 			return
 		} else {
-			log.Println("Error Connecting Database !!!")
+			log.Println("Error Connecting Database !!!",err)
 			return
 		}
 	}

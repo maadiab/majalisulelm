@@ -37,7 +37,7 @@ func ServeHome(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(ctx)
 	// defer cancel()
 
-	helper.ServeTemplates(w, "home.page.html")
+//	helper.ServeTemplates(w, "home.page.html")
 }
 
 // // login

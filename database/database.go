@@ -13,7 +13,7 @@ const (
 	Host     = "127.0.0.1"
 	User     = "postgres"
 	DbName   = "postgres"
-	Password = "passwd"
+	Password = "postgres"
 )
 
 var DB *sqlx.DB
@@ -34,7 +34,8 @@ func ConnectDB(ctx context.Context) (*sqlx.DB, error) {
 	// test connection
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+	
+		return nil, err
 	}
 
 	log.Println("connected sucsessfully to Database ...")
