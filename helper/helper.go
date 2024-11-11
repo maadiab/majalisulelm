@@ -32,7 +32,10 @@ func HashPassword(password string) ([]byte, error) {
 func CreateUser(db *sqlx.DB, user core.User) {
 
 	// if user send an empty json
-
+if user == (core.User{}) {
+	log.Println("Please Enter user name to add it!")
+	return
+}
 	// if user send incorrect json
 
 	// if it good
