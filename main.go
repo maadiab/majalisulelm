@@ -6,13 +6,24 @@ import (
 	"log"
 	"net/http"
 	"time"
-
+//	"html/template"
 	_ "github.com/lib/pq"
 	Database "github.com/maadiab/majalisulelm/database"
 	"github.com/maadiab/majalisulelm/router"
 )
 
+
+
 func main() {
+
+
+//	Tmpl:= template.Must(template.ParseGlob("templates/*.html"))
+
+//	Tmpl = template.Must(template.ParseGlob("templates/*.html"))
+
+// Serve static files (CSS, images, etc.) from the "static" folder
+// 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
