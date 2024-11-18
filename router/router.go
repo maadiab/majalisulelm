@@ -8,7 +8,6 @@ import (
 //	main "github.com/maadiab/majalisulelm/main"
 	"net/http")
 
-
 var	Tmpl = template.Must(template.ParseGlob("templates/*.html"))
 func Router() *mux.Router {
 	router := mux.NewRouter()

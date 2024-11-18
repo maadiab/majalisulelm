@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
+
 <head>
-  
-    <link href="./static/css/main.css" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My first site using htmx with go</title>
-    <script src="https://unpkg.com/htmx.org"></script>
+
+  <link href="./static/css/main.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My first site using htmx with go</title>
+  <script src="https://unpkg.com/htmx.org"></script>
 </head>
-<body class="text-red-500">
+
+<body class="h-screen">
+
+  <div class="flex w-full h-16">
+    <a class="flex-none w-64"></a>
+    <ul class="flex flex-1">
+      <li>الرئيسية
+      <li>
+      <li>دروس ومحاضرات اليوم</li>
+      <li>من نحن</li>
+    </ul>
+  </div>
+
+  <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500">
     {{ block "content" . }}{{ end }}
+  </div>
 </body>
+
 </html>

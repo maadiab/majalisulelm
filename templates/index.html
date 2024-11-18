@@ -1,8 +1,8 @@
 {{ define "content" }}
-<h1 class= "text-red-500">HTMX with Go</h1>
+<h1 class="">HTMX with Go</h1>
 <div id="dynamic-content">
-    <button class="text-red-700" hx-get="/update" hx-target="#dynamic-content" hx-swap="outerHTML">
-        Click Me
-    </button>
+  <button class="text-red-700" hx-get="/update" hx-target="#dynamic-content" hx-swap="outerHTML">
+    Click Me
+  </button>
 </div>
 {{ end }}
